@@ -1,32 +1,17 @@
 import { newE2EPage } from '@stencil/core/testing';
 
 describe('my-component', () => {
-  it('renders', async () => {
-    const page = await newE2EPage();
-
-    await page.setContent('<my-component></my-component>');
-    const element = await page.find('my-component');
-    expect(element).toHaveClass('hydrated');
-  });
-
-  it('renders changes to the name data', async () => {
-    const page = await newE2EPage();
-
-    await page.setContent('<my-component></my-component>');
+  it('should have test === "test"', async () => {
+    const page = await newE2EPage({
+      html: '<my-component></my-component>',
+    });
     const component = await page.find('my-component');
-    const element = await page.find('my-component >>> div');
-    expect(element.textContent).toEqual(`Hello, World! I'm `);
 
-    component.setProperty('first', 'James');
-    await page.waitForChanges();
-    expect(element.textContent).toEqual(`Hello, World! I'm James`);
-
-    component.setProperty('last', 'Quincy');
-    await page.waitForChanges();
-    expect(element.textContent).toEqual(`Hello, World! I'm James Quincy`);
-
-    component.setProperty('middle', 'Earl');
-    await page.waitForChanges();
-    expect(element.textContent).toEqual(`Hello, World! I'm James Earl Quincy`);
+    // Repro steps
+    // 1. run npm run test.watch my-component.e2e
+    // 2. wait for initial test run
+    // 3. keeping test watcher on, change my-component#test to something else and save
+    // 4. test will run again and pass (it should fail)
+    expect(await component.getProperty('test')).toBe('test');
   });
 });
